@@ -21,10 +21,10 @@ def chunkit(seq, num):
 #=======================================
 # TIME SERIES:
 #-------------
-N = 1024
+N = 46022
 x = np.random.random_sample((N,))  # time series samples for the duration of the obs.
 x = x - x.max()/2.                 
-dt = 3.90625 * 1e-3                # sampling interval in milliseconds
+dt = 8.69140625 * 1e-5                # sampling interval in seconds
 T = N * dt                         # duration of the observation in seconds
 P = 0.089                          # rotation period 
 Npulses = int(T/float(P))          # Number of pulses observed
@@ -34,7 +34,7 @@ Npulses = int(T/float(P))          # Number of pulses observed
 fp = 1/P            # frequency of the periodic signal
 fs = 1/dt           # Sampling frequency in Hz (number of samples per second)
 step = N/(T*fp)     # step of the position of the periodic signal
-x[::int(step)] =  2 # Adding a periodic signal
+x[::int(step)] =  5 # Adding a periodic signal
 
 ''' Devide an array sequence into chunks of given size'''
 print '--------------------------------------------------------------'
@@ -52,6 +52,8 @@ X = np.fft.fft(x)    # dft sample (signal in the frequency domain)
 df = 1/float(P)      # Fundamental frequency in Hz (first harmonic)
 dw = 2 * np.pi * df  # sampling rate of the dft (rad/sec) [of the dft elememts on the frequency axis]
 ny = (dw * N) / 2.   # nyquist frequency (2*max freq in the signal observed = Top frequency)
+
+
 '''
 # FOLDING:
 #-------------
@@ -78,7 +80,7 @@ print stacked'''
 #FREQUENCY ASSOCIATED WITH A PARTICULAR ELEMENT IN THE DFT (IN X):
 #----------------------------------------------------------------
 
-f = np.fft.fftfreq(N)
+f = np.fft.fftfreq(N, d=dt)
 #f = np.fft.fftfreq(N.d)          # dimentionless frequency associated with N samples fft
 #f = f * N * df                   # dimensional frequencies in Hz
 w = np.fft.fftfreq(N) * N * dw   # dimensional frequencies in rad/s
@@ -102,10 +104,10 @@ plt.subplot(2, 1, 1)
 plt.plot(x)
 plt.title('Time series samples')
 plt.subplot(2, 1, 2)
-plt.plot(f, X.real)
+plt.plot(f, abs(X.real))
 plt.title('Frequency domain signal')
 plt.ylabel('DFT value')
-plt.xlabel('Frequency')
+plt.xlabel('Frequency bin centers (cycle per second)')
 
 plt.figure()
 plt.subplot(2, 1, 1)
@@ -113,7 +115,7 @@ plt.plot(f[0:int(N/2.)], abs(X[0:int(N/2.)]))
 plt.ylabel('DFT magnitude')
 plt.title('Raw DFT valuesi[one sided]')
 plt.subplot(2, 1, 2)
-plt.plot(f[0:int(N/2.)], power[0:int(N/2.)])
+plt.plot(f[0:int(N/2.)], abs(power[0:int(N/2.)]))
 plt.ylabel('Power')
-plt.xlabel('cycles per period')
+plt.xlabel('Frequency bin centers (cycle per second)')
 plt.show()
