@@ -21,21 +21,22 @@ def chunkit(seq, num):
 #=======================================
 # TIME SERIES:
 #-------------
-N = 835946
+N = 1024
 x = np.random.random_sample((N,))  # time series samples for the duration of the obs.
 x = x - x.max()/2.                 
-dt = 4.785 * 1e-6                  # sampling interval in milliseconds
+dt = 3.90625 * 1e-3                # sampling interval in milliseconds
 T = N * dt                         # duration of the observation in seconds
 P = 0.089                          # rotation period 
 Npulses = int(T/float(P))          # Number of pulses observed
 
 # ADDING PERIODIC SIGNAL:
 #------------------------
-fp = 1/P            # periodic signal
+fp = 1/P            # frequency of the periodic signal
 fs = 1/dt           # Sampling frequency in Hz (number of samples per second)
 step = N/(T*fp)     # step of the position of the periodic signal
 x[::int(step)] =  2 # Adding a periodic signal
 
+''' Devide an array sequence into chunks of given size'''
 print '--------------------------------------------------------------'
 print 'I                      TIME SERIES INFO                      I'
 print '--------------------------------------------------------------\n'
@@ -48,7 +49,7 @@ print '\n--------------------------------------------------------------'
 #    DFT:
 #------------
 X = np.fft.fft(x)    # dft sample (signal in the frequency domain)
-df = 1/float(T)      # Fundamental frequency in Hz (first harmonic)
+df = 1/float(P)      # Fundamental frequency in Hz (first harmonic)
 dw = 2 * np.pi * df  # sampling rate of the dft (rad/sec) [of the dft elememts on the frequency axis]
 ny = (dw * N) / 2.   # nyquist frequency (2*max freq in the signal observed = Top frequency)
 '''
@@ -77,8 +78,9 @@ print stacked'''
 #FREQUENCY ASSOCIATED WITH A PARTICULAR ELEMENT IN THE DFT (IN X):
 #----------------------------------------------------------------
 
-f = np.fft.fftfreq(N)            # dimentionless frequency associated with N samples fft
-f = f * N * df                   # dimensional frequencies in Hz
+f = np.fft.fftfreq(N)
+#f = np.fft.fftfreq(N.d)          # dimentionless frequency associated with N samples fft
+#f = f * N * df                   # dimensional frequencies in Hz
 w = np.fft.fftfreq(N) * N * dw   # dimensional frequencies in rad/s
 print '---------------------------------------------------------------'
 print 'I                 FREQUENCY DOMAIN INFO                       I'
@@ -100,7 +102,7 @@ plt.subplot(2, 1, 1)
 plt.plot(x)
 plt.title('Time series samples')
 plt.subplot(2, 1, 2)
-plt.plot(f/1000000., X.real)
+plt.plot(f, X.real)
 plt.title('Frequency domain signal')
 plt.ylabel('DFT value')
 plt.xlabel('Frequency')
@@ -113,5 +115,5 @@ plt.title('Raw DFT valuesi[one sided]')
 plt.subplot(2, 1, 2)
 plt.plot(f[0:int(N/2.)], power[0:int(N/2.)])
 plt.ylabel('Power')
-plt.xlabel('Frequency')
+plt.xlabel('cycles per period')
 plt.show()
